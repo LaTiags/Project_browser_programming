@@ -28,6 +28,10 @@
         <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
         <button class="btn-secondary" onclick="document.getElementById('import-input').click()" data-i18n="import"></button>
         <button class="btn-secondary" onclick="exportJSON()" data-i18n="export"></button>
+        <!-- Bouton import Car Query API -->
+        <button class="btn-secondary btn-api" onclick="openImportAPI()">
+            🔍 <span data-i18n="import_api"></span>
+        </button>
         <button class="btn-add" onclick="openModal('add')">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M7 1v12M1 7h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
@@ -348,9 +352,54 @@
     </div>
 </div>
 
+<!-- ==============================
+     MODALE IMPORT CAR QUERY API
+============================== -->
+<div class="modal-overlay" id="import-api-overlay" onclick="closeImportAPIOutside(event)">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <div>
+                <div class="modal-title">🔍 Car Query Import</div>
+                <div class="modal-sub">Recherche des vrais modèles et importe-les dans ta base</div>
+            </div>
+            <button class="modal-close" onclick="closeImportAPI()">✕</button>
+        </div>
+
+        <div class="api-search-row">
+            <input class="form-input" id="api-search-input" type="text"
+                placeholder="Ex: Ferrari, BMW, Toyota…"
+                onkeydown="if(event.key==='Enter') searchCarQuery()">
+            <button class="btn-submit" onclick="searchCarQuery()" id="api-search-btn">
+                Rechercher
+            </button>
+        </div>
+
+        <div class="api-filters-row">
+            <select class="filter-select" id="api-year-filter" style="min-width:140px"></select>
+            <div class="api-results-count" id="api-results-count"></div>
+        </div>
+
+        <div class="api-results" id="api-results">
+            <div class="api-placeholder">
+                <div style="font-size:40px;margin-bottom:12px">🔍</div>
+                <div>Recherche une marque pour voir les modèles disponibles</div>
+            </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top:16px">
+            <button class="btn-cancel" onclick="closeImportAPI()">Fermer</button>
+            <button class="btn-submit" id="api-import-btn" onclick="importSelected()"
+                disabled style="opacity:0.4">
+                Importer la sélection (<span id="selected-count">0</span>)
+            </button>
+        </div>
+    </div>
+</div>
+
 <script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="translate.js"></script>
+<script src="carquery.js"></script>
 <script src="cars.js"></script>
 </body>
 </html>

@@ -95,6 +95,7 @@ const TRANSLATIONS = {
         sound_error:    "Impossible de lire ce fichier audio. Vérifie l'URL du son.",
         delete_confirm: 'Supprimer ce véhicule de la base ?',
 
+        import_api:     'Importer des modèles',
         lang_switch:    '🌐 EN',
 
         // Comparateur
@@ -222,6 +223,7 @@ const TRANSLATIONS = {
         sound_error:    'Unable to play this audio file. Check the sound URL.',
         delete_confirm: 'Remove this vehicle from the database?',
 
+        import_api:     'Import models',
         lang_switch:    '🌐 FR',
 
         // Comparator
