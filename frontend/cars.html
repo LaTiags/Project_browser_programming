@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FullThrottle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="cars.css">
+    <!-- Chart.js pour le dashboard stats -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+
+<!-- ==============================
+     HEADER
+============================== -->
+<header>
+    <div class="logo">
+        <div class="logo-icon">🏎️</div>
+        <div>
+            <div class="logo-text">AutoBase</div>
+            <div class="logo-sub" data-i18n="subtitle"></div>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+        <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
+        <button class="btn-secondary" onclick="document.getElementById('import-input').click()" data-i18n="import"></button>
+        <button class="btn-secondary" onclick="exportJSON()" data-i18n="export"></button>
+        <button class="btn-add" onclick="openModal('add')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span data-i18n="add_vehicle"></span>
+        </button>
+    </div>
+</header>
+
+<!-- ==============================
+     MAIN
+============================== -->
+<main>
+    <div class="stats-bar">
+        <div class="stat-chip"><span id="total-count">0</span> <span data-i18n="vehicles"></span></div>
+        <div class="stat-chip"><span id="marque-count">0</span> <span data-i18n="brands"></span></div>
+        <!-- Stats button -->
+        <div class="stat-chip clickable" onclick="openStats()" title="Voir les statistiques">
+            📊 <span data-i18n="stats_btn"></span>
+        </div>
+        <!-- Favorites filter -->
+        <div class="fav-chip" id="fav-chip" onclick="toggleFavsFilter()">
+            ★ <span data-i18n="favs_only"></span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="search-wrap">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.5"/>
+                <path d="M11 11l3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input class="search-input" type="text" id="search-input" oninput="renderCards()" data-i18n-placeholder="search_placeholder">
+        </div>
+        <select class="filter-select" id="filter-type" onchange="renderCards()">
+            <option value="" data-i18n="all_categories"></option>
+            <option>Berline</option><option>SUV</option><option>Coupé</option>
+            <option>Cabriolet</option><option>Supercar</option><option>Citadine</option>
+            <option>Break</option><option>Pick-up</option>
+        </select>
+        <select class="filter-select" id="filter-energy" onchange="renderCards()">
+            <option value="" data-i18n="all_engines"></option>
+            <option>Essence</option><option>Diesel</option><option>Électrique</option>
+            <option>Hybride</option><option>Hybride rechargeable</option>
+        </select>
+    </div>
+
+    <div class="grid-header">
+        <div class="grid-title" id="results-label"></div>
+        <!-- View toggle -->
+        <div class="view-toggle">
+            <button class="btn-view" data-view="grid" onclick="setView('grid')" title="Vue grille">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+            </button>
+            <button class="btn-view" data-view="list" onclick="setView('list')" title="Vue liste">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M1 4h14M1 8h14M1 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="cars-grid" id="cars-grid"></div>
+</main>
+
+<!-- ==============================
+     BARRE FLOTTANTE COMPARATEUR
+============================== -->
+<div class="compare-bar" id="compare-bar">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600" data-i18n="compare_label"></div>
+    <div class="compare-bar-slots">
+        <div class="compare-slot">Slot libre</div>
+        <div class="compare-slot">Slot libre</div>
+    </div>
+    <button class="btn-compare-go" onclick="openCompare()" disabled data-i18n="compare_go"></button>
+    <button class="btn-compare-clear" onclick="clearCompare()" data-i18n="compare_clear"></button>
+</div>
+
+<!-- ==============================
+     MODALE COMPARATEUR
+============================== -->
+<div class="compare-overlay" id="compare-overlay" onclick="if(event.target===this)closeCompare()">
+    <div class="compare-modal">
+        <div class="compare-modal-header">
+            <div class="compare-modal-title" data-i18n="compare_title"></div>
+            <button class="modal-close" onclick="closeCompare()">✕</button>
+        </div>
+        <div id="compare-content"></div>
+    </div>
+</div>
+
+<!-- ==============================
+     MODALE STATS DASHBOARD
+============================== -->
+<div class="stats-overlay" id="stats-overlay" onclick="if(event.target===this)closeStats()">
+    <div class="stats-modal">
+        <div class="stats-modal-header">
+            <div class="stats-modal-title" data-i18n="stats_title"></div>
+            <button class="modal-close" onclick="closeStats()">✕</button>
+        </div>
+
+        <!-- KPIs -->
+        <div class="stats-kpis">
+            <div class="stats-kpi">
+                <div class="stats-kpi-val" id="stat-avg-pow">—</div>
+                <div class="stats-kpi-label" data-i18n="stat_avg_pow"></div>
+            </div>
+            <div class="stats-kpi">
+                <div class="stats-kpi-val" id="stat-max-pow">—</div>
+                <div class="stats-kpi-label" data-i18n="stat_max_pow"></div>
+            </div>
+            <div class="stats-kpi">
+                <div class="stats-kpi-val" id="stat-avg-acc">—</div>
+                <div class="stats-kpi-label" data-i18n="stat_avg_acc"></div>
+            </div>
+            <div class="stats-kpi">
+                <div class="stats-kpi-val" id="stat-brands">—</div>
+                <div class="stats-kpi-label" data-i18n="brands"></div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="stats-charts-grid">
+            <!-- By type -->
+            <div class="stats-chart-card">
+                <div class="stats-chart-title" data-i18n="stat_by_type"></div>
+                <div class="stats-bar-list" id="stat-by-type"></div>
+            </div>
+            <!-- By energy donut -->
+            <div class="stats-chart-card">
+                <div class="stats-chart-title" data-i18n="stat_by_energy"></div>
+                <div class="stats-donut-wrap">
+                    <canvas id="stat-donut" class="stats-donut-canvas" role="img" aria-label="Répartition par motorisation"></canvas>
+                    <div class="stats-legend" id="stat-energy-legend"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top power -->
+        <div class="stats-top">
+            <div class="stats-top-title" data-i18n="stat_top_pow"></div>
+            <div class="stats-top-list" id="stat-top-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==============================
+     MODALE AJOUT / ÉDITION
+============================== -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <div>
+                <div class="modal-title" id="modal-title"></div>
+                <div class="modal-sub" data-i18n="modal_sub"></div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label" data-i18n="brand"></label>
+                <input class="form-input" id="f-marque" type="text" data-i18n-placeholder="brand_ph">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="model"></label>
+                <input class="form-input" id="f-modele" type="text" data-i18n-placeholder="model_ph">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="year"></label>
+                <input class="form-input" id="f-annee" type="number" placeholder="2024" min="1886" max="2100">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="country"></label>
+                <input class="form-input" id="f-pays" type="text" data-i18n-placeholder="country_ph">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="category"></label>
+                <select class="form-select" id="f-type">
+                    <option value="" data-i18n="select"></option>
+                    <option>Berline</option><option>SUV</option><option>Coupé</option>
+                    <option>Cabriolet</option><option>Supercar</option><option>Citadine</option>
+                    <option>Break</option><option>Pick-up</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="engine_type"></label>
+                <select class="form-select" id="f-energy">
+                    <option value="" data-i18n="select"></option>
+                    <option>Essence</option><option>Diesel</option><option>Électrique</option>
+                    <option>Hybride</option><option>Hybride rechargeable</option>
+                </select>
+            </div>
+
+            <div class="form-separator full" data-i18n="section_engine"></div>
+
+            <div class="form-group">
+                <label class="form-label" data-i18n="power"></label>
+                <input class="form-input" id="f-puissance" type="number" placeholder="670">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="torque"></label>
+                <input class="form-input" id="f-couple" type="number" placeholder="760">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="displacement"></label>
+                <input class="form-input" id="f-cylindree" type="number" placeholder="3902">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="cylinders"></label>
+                <input class="form-input" id="f-cylindres" type="number" placeholder="8">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="acceleration"></label>
+                <input class="form-input" id="f-acceleration" type="number" step="0.1" placeholder="3.0">
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-i18n="top_speed"></label>
+                <input class="form-input" id="f-vmax" type="number" placeholder="330">
+            </div>
+
+            <div class="form-separator full" data-i18n="section_media"></div>
+
+            <div class="form-group full">
+                <label class="form-label" data-i18n="image_url"></label>
+                <input class="form-input" id="f-image" type="url" data-i18n-placeholder="image_ph">
+            </div>
+            <div class="form-group full">
+                <label class="form-label" data-i18n="sound_url"></label>
+                <input class="form-input" id="f-sound" type="url" data-i18n-placeholder="sound_ph">
+            </div>
+
+            <div class="form-separator full" data-i18n="section_desc"></div>
+
+            <div class="form-group full">
+                <label class="form-label" data-i18n="desc_fr"></label>
+                <textarea class="form-input" id="f-description-fr" rows="4" style="resize:vertical" data-i18n-placeholder="desc_fr_ph"></textarea>
+            </div>
+
+            <div class="form-group full translate-row">
+                <button class="btn-translate" id="btn-translate" type="button" onclick="translateDescription()">
+                    <span id="translate-icon">✨</span>
+                    <span id="translate-label" data-i18n="translate_btn"></span>
+                </button>
+                <div class="translate-hint" data-i18n="translate_hint"></div>
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label" data-i18n="desc_en"></label>
+                <textarea class="form-input" id="f-description-en" rows="4" style="resize:vertical" data-i18n-placeholder="desc_en_ph"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()" data-i18n="cancel"></button>
+            <button class="btn-submit" id="modal-submit-btn" onclick="submitCar()"></button>
+        </div>
+    </div>
+</div>
+
+<!-- ==============================
+     MODALE FICHE DÉTAIL
+============================== -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetailOutside(event)">
+    <div class="detail-modal">
+
+        <div class="detail-hero" id="detail-hero">
+            <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔊</button>
+            <audio id="motor-audio" loop></audio>
+            <div class="detail-hero-content">
+                <div class="detail-hero-marque" id="detail-marque"></div>
+                <div class="detail-hero-name"   id="detail-name"></div>
+                <div class="detail-hero-sub"    id="detail-sub"></div>
+            </div>
+        </div>
+
+        <div class="detail-body">
+            <div class="detail-actions">
+                <button class="btn-edit"   onclick="editCurrent()"   data-i18n="edit"></button>
+                <button class="btn-danger" onclick="deleteCurrent()" data-i18n="delete"></button>
+                <button class="btn-cancel" onclick="closeDetail()"   data-i18n="close"></button>
+            </div>
+
+            <div class="detail-description" id="detail-description"></div>
+
+            <div class="specs-title" data-i18n="specs_title"></div>
+            <div class="specs-grid" id="specs-grid"></div>
+
+            <!-- Performance bars -->
+            <div class="perf-bars" id="perf-bars" style="display:none">
+                <div class="perf-bars-title" data-i18n="perf_title"></div>
+                <div id="perf-bars-inner"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="api.js"></script>
+<script src="translate.js"></script>
+<script src="cars.js"></script>
+</body>
+</html>
