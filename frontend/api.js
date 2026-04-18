@@ -27,8 +27,8 @@
 //   exposée dans le frontend. La sécurité est gérée par RLS.
 // ============================================================
 
-const SUPABASE_URL      = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = 'https://gathpbjhirtksasfmicn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_DCM5-BubeSaz0ipRero-7Q_9KXu2WU7';
 
 // URL complète vers la table "cars"
 const CARS_URL = `${SUPABASE_URL}/rest/v1/cars`;
