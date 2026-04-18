@@ -30,7 +30,14 @@
 // ============================================================
 
 const CARQUERY_BASE = 'https://www.carqueryapi.com/api/0.3/';
-const CORS_PROXY    = 'https://api.allorigins.win/raw?url=';
+
+// Liste de proxies CORS à essayer dans l'ordre.
+// Si l'un échoue (bloqué par le réseau ou down), on essaie le suivant.
+const CORS_PROXIES = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    url => `https://thingproxy.freeboard.io/fetch/${url}`,
+];
 
 // État local de la modale d'import
 let apiResults   = [];          // Résultats bruts de la dernière recherche
@@ -123,12 +130,26 @@ async function searchCarQuery() {
         // On encode l'URL Car Query pour la passer en paramètre au proxy
         // encodeURIComponent() transforme les / : ? & en codes %XX
         const carQueryUrl = `${CARQUERY_BASE}?cmd=getModels&make=${encodeURIComponent(input)}&callback=?`;
-        const proxyUrl    = `${CORS_PROXY}${encodeURIComponent(carQueryUrl)}`;
 
-        const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error(`Erreur réseau : ${response.status}`);
+        // Essaie chaque proxy dans l'ordre jusqu'à en trouver un qui répond
+        let text = null;
+        let lastError = null;
 
-        let text = await response.text();
+        for (const buildProxyUrl of CORS_PROXIES) {
+            try {
+                const proxyUrl = buildProxyUrl(carQueryUrl);
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error(`Statut ${response.status}`);
+                text = await response.text();
+                break; // Un proxy a fonctionné, on sort de la boucle
+            } catch (err) {
+                lastError = err;
+                console.warn('Proxy échoué, essai suivant…', err.message);
+            }
+        }
+
+        // Si aucun proxy n'a fonctionné
+        if (text === null) throw new Error(`Tous les proxies ont échoué : ${lastError?.message}`);
 
         // Retire le wrapper JSONP : ?({ ... }) → { ... }
         text = text.replace(/^\?\(/, '').replace(/\);?\s*$/, '');
