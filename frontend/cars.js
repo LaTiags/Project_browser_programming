@@ -1,12 +1,5 @@
 // ============================================================
 //   cars.js — Logique principale (version améliorée)
-//
-//   Nouvelles fonctionnalités :
-//   - Vue liste / grille (toggle)
-//   - Comparateur de 2 véhicules côte à côte
-//   - Dashboard statistiques
-//   - Favoris (localStorage)
-//   - Barres de performance dans la fiche détail
 // ============================================================
 
 
@@ -15,14 +8,22 @@
 // ============================================================
 
 const EMOJIS = {
-    'Supercar': '🏎️', 'SUV': '🚙', 'Berline': '🚗',
-    'Coupé': '🚗', 'Cabriolet': '🚗', 'Citadine': '🚕',
-    'Break': '🚐', 'Pick-up': '🛻',
+    'Supercar':   '🏎️', 'Hypercar':   '🏎️',
+    'SUV':        '🚙',
+    'Berline':    '🚗', 'Sedan':      '🚗',
+    'Coupé':      '🚗', 'Coupe':      '🚗',
+    'Cabriolet':  '🚗', 'Convertible':'🚗',
+    'Citadine':   '🚕', 'City car':   '🚕',
+    'Break':      '🚐', 'Estate':     '🚐',
+    'Pick-up':    '🛻',
 };
 
 const ENERGY_COLORS = {
-    'Électrique': '#4ade80', 'Hybride': '#60a5fa',
-    'Hybride rechargeable': '#34d399', 'Essence': '#fbbf24', 'Diesel': '#94a3b8',
+    'Électrique': '#4ade80', 'Electric': '#4ade80',
+    'Hybride': '#60a5fa', 'Hybrid': '#60a5fa',
+    'Hybride rechargeable': '#34d399', 'Plug-in hybrid': '#34d399',
+    'Essence': '#fbbf24', 'Petrol': '#fbbf24',
+    'Diesel': '#94a3b8',
 };
 
 // Puissance max référence pour les barres de performance
@@ -30,8 +31,52 @@ const MAX_REF = {
     puissance: 1500,
     couple: 1600,
     vmax: 400,
-    acceleration: 10, // inversé : moins c'est mieux
+    acceleration: 10,
 };
+
+
+// ============================================================
+//   TRADUCTION DES VALEURS (catégories, motorisations, pays)
+// ============================================================
+
+function translateValue(value) {
+    if (!value) return value;
+    const map = {
+        // Catégories
+        'Berline':   { en: 'Sedan' },
+        'SUV':       { en: 'SUV' },
+        'Coupé':     { en: 'Coupe' },
+        'Cabriolet': { en: 'Convertible' },
+        'Supercar':  { en: 'Supercar' },
+        'Hypercar':  { en: 'Hypercar' },
+        'Citadine':  { en: 'City car' },
+        'Break':     { en: 'Estate' },
+        'Pick-up':   { en: 'Pick-up' },
+        // Motorisations
+        'Essence':              { en: 'Petrol' },
+        'Diesel':               { en: 'Diesel' },
+        'Électrique':           { en: 'Electric' },
+        'Hybride':              { en: 'Hybrid' },
+        'Hybride rechargeable': { en: 'Plug-in hybrid' },
+        // Pays
+        'Italie':       { en: 'Italy' },
+        'Allemagne':    { en: 'Germany' },
+        'France':       { en: 'France' },
+        'États-Unis':   { en: 'USA' },
+        'Japon':        { en: 'Japan' },
+        'Royaume-Uni':  { en: 'UK' },
+        'Suède':        { en: 'Sweden' },
+        'Espagne':      { en: 'Spain' },
+        'Autriche':     { en: 'Austria' },
+        'Suisse':       { en: 'Switzerland' },
+        'Angleterre':   { en: 'England' },
+        'Tchéquie':     { en: 'Czech Republic' },
+        'Roumanie':     { en: 'Romania' },
+        'Corée du Sud': { en: 'South Korea' },
+    };
+    if (currentLang === 'en' && map[value]) return map[value].en;
+    return value;
+}
 
 
 // ============================================================
@@ -39,8 +84,8 @@ const MAX_REF = {
 // ============================================================
 
 let cars = [];
-let currentView = localStorage.getItem('autobase_view') || 'grid'; // 'grid' | 'list'
-let compareIds = [];       // max 2 ids
+let currentView = localStorage.getItem('autobase_view') || 'grid';
+let compareIds = [];
 let favIds = new Set(JSON.parse(localStorage.getItem('autobase_favs') || '[]'));
 let showFavsOnly = false;
 
@@ -93,11 +138,11 @@ function showStatus(message, type = 'info') {
         document.body.appendChild(banner);
     }
 
-    banner.textContent               = message;
-    banner.style.background          = colors[type];
-    banner.style.borderColor         = borders[type];
-    banner.style.color               = '#f0e8f5';
-    banner.style.opacity             = '1';
+    banner.textContent     = message;
+    banner.style.background  = colors[type];
+    banner.style.borderColor = borders[type];
+    banner.style.color       = '#f0e8f5';
+    banner.style.opacity     = '1';
 
     clearTimeout(banner._timeout);
     banner._timeout = setTimeout(() => { banner.style.opacity = '0'; }, 3000);
@@ -133,7 +178,6 @@ async function initApp() {
         }
     }
 
-    // Init view toggle UI
     setViewToggleUI();
 }
 
@@ -189,7 +233,7 @@ function exportJSON() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `autobase_export_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `fullthrottle_export_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -262,7 +306,6 @@ function renderCards() {
                 <h3>${t('empty_title')}</h3>
                 <p>${t('empty_text')}</p>
             </div>`;
-        // Ensure correct class
         grid.className = currentView === 'list' ? 'cars-list' : 'cars-grid';
         return;
     }
@@ -278,9 +321,12 @@ function renderCards() {
 
 function renderCardHTML(car, i) {
     const colorE    = ENERGY_COLORS[car.energy] || 'var(--violet)';
-    const tagType   = car.type   ? `<span class="tag">${car.type}</span>` : '';
-    const tagEnergy = car.energy ? `<span class="tag" style="color:${colorE};border-color:${colorE}33;background:${colorE}11">${car.energy}</span>` : '';
-    const tagPays   = car.pays   ? `<span class="tag" style="color:var(--muted);border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.04)">${car.pays}</span>` : '';
+    const typeLabel   = translateValue(car.type);
+    const energyLabel = translateValue(car.energy);
+    const paysLabel   = translateValue(car.pays);
+    const tagType   = typeLabel   ? `<span class="tag">${typeLabel}</span>` : '';
+    const tagEnergy = energyLabel ? `<span class="tag" style="color:${colorE};border-color:${colorE}33;background:${colorE}11">${energyLabel}</span>` : '';
+    const tagPays   = paysLabel   ? `<span class="tag" style="color:var(--muted);border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.04)">${paysLabel}</span>` : '';
     const power     = car.puissance ? `<strong>${car.puissance} ${currentLang === 'fr' ? 'ch' : 'hp'}</strong>` : '';
     const year      = car.annee  ? ` · ${car.annee}` : '';
     const soundIcon = car.sound  ? `<span class="card-sound-icon" title="Son moteur disponible">🔊</span>` : '';
@@ -331,9 +377,12 @@ function renderCardHTML(car, i) {
 }
 
 function renderRowHTML(car, i) {
-    const colorE = ENERGY_COLORS[car.energy] || 'var(--violet)';
-    const tagType   = car.type   ? `<span class="tag">${car.type}</span>` : '';
-    const tagEnergy = car.energy ? `<span class="tag" style="color:${colorE};border-color:${colorE}33;background:${colorE}11">${car.energy}</span>` : '';
+    const colorE      = ENERGY_COLORS[car.energy] || 'var(--violet)';
+    const typeLabel   = translateValue(car.type);
+    const energyLabel = translateValue(car.energy);
+    const paysLabel   = translateValue(car.pays);
+    const tagType   = typeLabel   ? `<span class="tag">${typeLabel}</span>` : '';
+    const tagEnergy = energyLabel ? `<span class="tag" style="color:${colorE};border-color:${colorE}33;background:${colorE}11">${energyLabel}</span>` : '';
     const initials  = (car.marque[0] || '') + (car.modele[0] || '');
     const isFav     = favIds.has(car.id);
 
@@ -348,13 +397,13 @@ function renderRowHTML(car, i) {
             <div class="car-row-thumb">${thumbHtml}</div>
             <div class="car-row-info">
                 <div class="car-row-name">${car.marque} ${car.modele}</div>
-                <div class="car-row-sub">${[car.annee, car.pays].filter(Boolean).join(' · ')}</div>
+                <div class="car-row-sub">${[car.annee, paysLabel].filter(Boolean).join(' · ')}</div>
             </div>
             <div class="car-row-tags">${tagType}${tagEnergy}</div>
             <div class="car-row-stats">
-                ${car.puissance ? `<div class="car-row-stat"><div class="car-row-stat-val">${car.puissance}</div><div class="car-row-stat-label">${currentLang === 'fr' ? 'ch' : 'hp'}</div></div>` : ''}
+                ${car.puissance    ? `<div class="car-row-stat"><div class="car-row-stat-val">${car.puissance}</div><div class="car-row-stat-label">${currentLang === 'fr' ? 'ch' : 'hp'}</div></div>` : ''}
                 ${car.acceleration ? `<div class="car-row-stat"><div class="car-row-stat-val">${car.acceleration}s</div><div class="car-row-stat-label">0-100</div></div>` : ''}
-                ${car.vmax ? `<div class="car-row-stat"><div class="car-row-stat-val">${car.vmax}</div><div class="car-row-stat-label">km/h</div></div>` : ''}
+                ${car.vmax         ? `<div class="car-row-stat"><div class="car-row-stat-val">${car.vmax}</div><div class="car-row-stat-label">km/h</div></div>` : ''}
             </div>
             <div class="car-row-actions">
                 <button style="background:none;border:none;color:${isFav ? 'var(--yellow)' : 'var(--muted)'};font-size:16px;cursor:pointer;padding:4px" onclick="toggleFav(${car.id}, event)">${isFav ? '★' : '☆'}</button>
@@ -377,7 +426,7 @@ function toggleCompare(id) {
         compareIds = compareIds.filter(i => i !== id);
     } else {
         if (compareIds.length >= 2) {
-            showStatus('⚠ Maximum 2 véhicules à comparer', 'info');
+            showStatus(currentLang === 'fr' ? '⚠ Maximum 2 véhicules à comparer' : '⚠ Maximum 2 vehicles to compare', 'info');
             return;
         }
         compareIds.push(id);
@@ -422,16 +471,15 @@ function openCompare() {
     const [a, b] = compareIds.map(id => cars.find(c => c.id === id));
     if (!a || !b) return;
 
-    const overlay = document.getElementById('compare-overlay');
+    const overlay   = document.getElementById('compare-overlay');
     const container = document.getElementById('compare-content');
 
-    // Stat rows to compare
     const statRows = [
-        { key: 'puissance',    label: currentLang === 'fr' ? 'Puissance' : 'Power',      unit: currentLang === 'fr' ? 'ch' : 'hp', higher: true },
-        { key: 'couple',       label: currentLang === 'fr' ? 'Couple' : 'Torque',        unit: 'Nm', higher: true },
-        { key: 'vmax',         label: currentLang === 'fr' ? 'Vmax' : 'Top speed',       unit: 'km/h', higher: true },
-        { key: 'acceleration', label: '0-100',                                             unit: 's',   higher: false },
-        { key: 'cylindree',    label: currentLang === 'fr' ? 'Cylindrée' : 'Displacement', unit: 'cm³', higher: true },
+        { key: 'puissance',    label: currentLang === 'fr' ? 'Puissance' : 'Power',       unit: currentLang === 'fr' ? 'ch' : 'hp', higher: true },
+        { key: 'couple',       label: currentLang === 'fr' ? 'Couple' : 'Torque',         unit: 'Nm',   higher: true },
+        { key: 'vmax',         label: currentLang === 'fr' ? 'Vmax' : 'Top speed',        unit: 'km/h', higher: true },
+        { key: 'acceleration', label: '0-100',                                              unit: 's',    higher: false },
+        { key: 'cylindree',    label: currentLang === 'fr' ? 'Cylindrée' : 'Displacement', unit: 'cm³',  higher: true },
     ].filter(s => a[s.key] != null || b[s.key] != null);
 
     const heroA = buildCompareHero(a);
@@ -453,22 +501,20 @@ function openCompare() {
             </div>`;
     }).join('');
 
-    // Bar chart visualization
-    const maxPow = Math.max(a.puissance || 0, b.puissance || 0, 1);
-    const maxVmax = Math.max(a.vmax || 0, b.vmax || 0, 1);
-    const maxCouple = Math.max(a.couple || 0, b.couple || 0, 1);
+    const maxPow   = Math.max(a.puissance || 0, b.puissance || 0, 1);
+    const maxVmax  = Math.max(a.vmax      || 0, b.vmax      || 0, 1);
+    const maxCouple = Math.max(a.couple   || 0, b.couple    || 0, 1);
 
     const barsHTML = `
         <div class="compare-bar-wrap">
-            ${buildCompareBarItem(currentLang === 'fr' ? 'Puissance' : 'Power', a, b, 'puissance', maxPow, currentLang === 'fr' ? 'ch' : 'hp')}
-            ${buildCompareBarItem('Vmax', a, b, 'vmax', maxVmax, 'km/h')}
-            ${buildCompareBarItem(currentLang === 'fr' ? 'Couple' : 'Torque', a, b, 'couple', maxCouple, 'Nm')}
+            ${buildCompareBarItem(currentLang === 'fr' ? 'Puissance' : 'Power', a, b, 'puissance', maxPow,   currentLang === 'fr' ? 'ch' : 'hp')}
+            ${buildCompareBarItem('Vmax',                                         a, b, 'vmax',      maxVmax,  'km/h')}
+            ${buildCompareBarItem(currentLang === 'fr' ? 'Couple' : 'Torque',    a, b, 'couple',    maxCouple,'Nm')}
         </div>`;
 
     container.innerHTML = `
         <div class="compare-cars-grid" style="margin-bottom:28px">
-            ${heroA}
-            ${heroB}
+            ${heroA}${heroB}
         </div>
         ${rowsHTML ? `<div class="compare-specs">${rowsHTML}</div>` : ''}
         ${barsHTML}`;
@@ -525,8 +571,7 @@ function closeCompare() {
 // ============================================================
 
 function openStats() {
-    const overlay = document.getElementById('stats-overlay');
-    overlay.classList.add('open');
+    document.getElementById('stats-overlay').classList.add('open');
     renderStats();
 }
 
@@ -535,50 +580,48 @@ function closeStats() {
 }
 
 function renderStats() {
-    const avgPow = Math.round(cars.filter(c => c.puissance).reduce((s, c) => s + c.puissance, 0) / (cars.filter(c => c.puissance).length || 1));
-    const maxPow = Math.max(...cars.map(c => c.puissance || 0));
+    const avgPow  = Math.round(cars.filter(c => c.puissance).reduce((s, c) => s + c.puissance, 0) / (cars.filter(c => c.puissance).length || 1));
+    const maxPow  = Math.max(...cars.map(c => c.puissance || 0));
     const avgAccel = (cars.filter(c => c.acceleration).reduce((s, c) => s + c.acceleration, 0) / (cars.filter(c => c.acceleration).length || 1)).toFixed(1);
-    const brands = [...new Set(cars.map(c => c.marque))].length;
+    const brands  = [...new Set(cars.map(c => c.marque))].length;
 
-    document.getElementById('stat-avg-pow').textContent  = avgPow || '—';
-    document.getElementById('stat-max-pow').textContent  = maxPow || '—';
-    document.getElementById('stat-avg-acc').textContent  = avgAccel;
-    document.getElementById('stat-brands').textContent   = brands;
+    document.getElementById('stat-avg-pow').textContent = avgPow  || '—';
+    document.getElementById('stat-max-pow').textContent = maxPow  || '—';
+    document.getElementById('stat-avg-acc').textContent = avgAccel;
+    document.getElementById('stat-brands').textContent  = brands;
 
-    // --- Répartition par type ---
+    // Répartition par type
     const byType = {};
     cars.forEach(c => { if (c.type) byType[c.type] = (byType[c.type] || 0) + 1; });
     const sortedTypes = Object.entries(byType).sort((a, b) => b[1] - a[1]);
     const maxTypeCount = sortedTypes[0]?.[1] || 1;
     document.getElementById('stat-by-type').innerHTML = sortedTypes.map(([name, count]) => `
         <div class="stats-bar-row">
-            <div class="stats-bar-name">${name}</div>
+            <div class="stats-bar-name">${translateValue(name)}</div>
             <div class="stats-bar-track">
                 <div class="stats-bar-inner" style="width:0%" data-target="${Math.round(count/maxTypeCount*100)}"></div>
             </div>
             <div class="stats-bar-count">${count}</div>
         </div>`).join('');
 
-    // --- Répartition par énergie (donut) ---
+    // Répartition par énergie (donut)
     const byEnergy = {};
     cars.forEach(c => { if (c.energy) byEnergy[c.energy] = (byEnergy[c.energy] || 0) + 1; });
     const energyEntries = Object.entries(byEnergy).sort((a, b) => b[1] - a[1]);
-    const donutColors = ['#EE82EE','#4ade80','#60a5fa','#fbbf24','#f87171'];
+    const donutColors   = ['#EE82EE','#4ade80','#60a5fa','#fbbf24','#f87171'];
 
-    const legendHTML = energyEntries.map(([name, count], i) => `
+    document.getElementById('stat-energy-legend').innerHTML = energyEntries.map(([name, count], i) => `
         <div class="stats-legend-item">
             <div class="stats-legend-dot" style="background:${donutColors[i] || '#888'}"></div>
-            ${name} (${count})
+            ${translateValue(name)} (${count})
         </div>`).join('');
-    document.getElementById('stat-energy-legend').innerHTML = legendHTML;
 
-    // Draw donut
     const ctx = document.getElementById('stat-donut').getContext('2d');
     if (window._donutChart) window._donutChart.destroy();
     window._donutChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: energyEntries.map(e => e[0]),
+            labels: energyEntries.map(e => translateValue(e[0])),
             datasets: [{
                 data: energyEntries.map(e => e[1]),
                 backgroundColor: donutColors.slice(0, energyEntries.length),
@@ -594,7 +637,7 @@ function renderStats() {
         }
     });
 
-    // --- Top puissances ---
+    // Top puissances
     const topPow = [...cars].filter(c => c.puissance).sort((a, b) => b.puissance - a.puissance).slice(0, 5);
     document.getElementById('stat-top-list').innerHTML = topPow.map((car, i) => `
         <div class="stats-top-item" onclick="closeStats(); setTimeout(() => openDetail(${car.id}), 200)">
@@ -603,7 +646,6 @@ function renderStats() {
             <div class="stats-top-val">${car.puissance} <span style="font-size:12px;color:var(--muted)">${currentLang === 'fr' ? 'ch' : 'hp'}</span></div>
         </div>`).join('');
 
-    // Animate bars after a frame
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             document.querySelectorAll('.stats-bar-inner[data-target]').forEach(el => {
@@ -631,7 +673,7 @@ function openDetail(id) {
     document.getElementById('detail-marque').textContent = car.marque;
     document.getElementById('detail-name').textContent   = car.modele;
     document.getElementById('detail-sub').textContent    =
-        [car.annee, car.pays, car.type].filter(Boolean).join(' · ');
+        [car.annee, translateValue(car.pays), translateValue(car.type)].filter(Boolean).join(' · ');
 
     const audio    = document.getElementById('motor-audio');
     const soundBtn = document.getElementById('sound-btn');
@@ -641,7 +683,7 @@ function openDetail(id) {
     soundBtn.style.display = car.sound ? 'flex' : 'none';
     if (car.sound) audio.src = car.sound;
 
-    const descEl = document.getElementById('detail-description');
+    const descEl   = document.getElementById('detail-description');
     const descText = currentLang === 'en'
         ? (car.description_en || car.description_fr || car.description || '')
         : (car.description_fr || car.description || '');
@@ -655,7 +697,7 @@ function openDetail(id) {
         [t('spec_cylinders'),    car.cylindres,    'cyl.'],
         [t('spec_accel'),        car.acceleration, 's'],
         [t('spec_vmax'),         car.vmax,         'km/h'],
-        [t('spec_engine'),       car.energy,       ''],
+        [t('spec_engine'),       translateValue(car.energy), ''],
         [t('spec_year'),         car.annee,        ''],
     ];
 
@@ -674,10 +716,10 @@ function openDetail(id) {
     // Performance bars
     const perfContainer = document.getElementById('perf-bars');
     const perfBars = [
-        { label: currentLang === 'fr' ? 'Puissance' : 'Power',      val: car.puissance,    max: MAX_REF.puissance,    unit: currentLang === 'fr' ? 'ch' : 'hp' },
-        { label: currentLang === 'fr' ? 'Couple' : 'Torque',        val: car.couple,       max: MAX_REF.couple,       unit: 'Nm' },
-        { label: 'Vmax',                                              val: car.vmax,         max: MAX_REF.vmax,         unit: 'km/h' },
-        { label: '0-100',                                             val: car.acceleration, max: MAX_REF.acceleration, unit: 's', invert: true },
+        { label: currentLang === 'fr' ? 'Puissance' : 'Power',  val: car.puissance,    max: MAX_REF.puissance,    unit: currentLang === 'fr' ? 'ch' : 'hp' },
+        { label: currentLang === 'fr' ? 'Couple' : 'Torque',    val: car.couple,       max: MAX_REF.couple,       unit: 'Nm' },
+        { label: 'Vmax',                                          val: car.vmax,         max: MAX_REF.vmax,         unit: 'km/h' },
+        { label: '0-100',                                         val: car.acceleration, max: MAX_REF.acceleration, unit: 's', invert: true },
     ].filter(b => b.val != null);
 
     if (perfBars.length > 0) {
@@ -703,7 +745,6 @@ function openDetail(id) {
 
     document.getElementById('detail-overlay').classList.add('open');
 
-    // Animate perf bars
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             document.querySelectorAll('.perf-bar-fill[data-target]').forEach(el => {
@@ -778,10 +819,10 @@ async function handleDelete(id) {
         saveCache();
         updateCompareBar();
         renderCards();
-        showStatus('🗑 Véhicule supprimé', 'info');
+        showStatus(currentLang === 'fr' ? '🗑 Véhicule supprimé' : '🗑 Vehicle deleted', 'info');
     } catch (error) {
         console.error('Erreur lors de la suppression :', error);
-        showStatus('✗ Erreur lors de la suppression', 'error');
+        showStatus(currentLang === 'fr' ? '✗ Erreur lors de la suppression' : '✗ Error deleting vehicle', 'error');
     }
 }
 
@@ -889,11 +930,11 @@ async function submitCar() {
             const updated = await updateCar(editingId, carData);
             const index = cars.findIndex(c => c.id === editingId);
             if (index !== -1) cars[index] = updated;
-            showStatus('✓ Véhicule modifié', 'success');
+            showStatus(currentLang === 'fr' ? '✓ Véhicule modifié' : '✓ Vehicle updated', 'success');
         } else {
             const created = await addCar(carData);
             cars.push(created);
-            showStatus('✓ Véhicule ajouté', 'success');
+            showStatus(currentLang === 'fr' ? '✓ Véhicule ajouté' : '✓ Vehicle added', 'success');
         }
 
         saveCache();
@@ -901,7 +942,7 @@ async function submitCar() {
         renderCards();
     } catch (error) {
         console.error('Erreur lors de la sauvegarde :', error);
-        showStatus('✗ Erreur lors de la sauvegarde', 'error');
+        showStatus(currentLang === 'fr' ? '✗ Erreur lors de la sauvegarde' : '✗ Error saving vehicle', 'error');
     }
 }
 
