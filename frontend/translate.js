@@ -91,7 +91,7 @@ async function translateDescription() {
             q:        textFr,
             langpair: 'fr|en',
             // Décommente la ligne suivante et mets ton email pour 10 000 req/jour :
-            // de: 'ton@email.com',
+             de: 'cristianolecrack@gmail.com',
         });
 
         // fetch() GET — l'URL contient tous les paramètres

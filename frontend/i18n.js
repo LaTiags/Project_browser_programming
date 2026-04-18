@@ -111,6 +111,24 @@ const TRANSLATIONS = {
         stat_by_type:   'Répartition par catégorie',
         stat_by_energy: 'Répartition par motorisation',
         stat_top_pow:   '🏆 Top puissance',
+
+        // Catégories
+        cat_berline:    'Berline',
+        cat_suv:        'SUV',
+        cat_coupe:      'Coupé',
+        cat_cabriolet:  'Cabriolet',
+        cat_supercar:   'Supercar',
+        cat_hypercar:   'Hypercar',
+        cat_citadine:   'Citadine',
+        cat_break:      'Break',
+        cat_pickup:     'Pick-up',
+
+        // Motorisations
+        eng_essence:    'Essence',
+        eng_diesel:     'Diesel',
+        eng_elec:       'Électrique',
+        eng_hybrid:     'Hybride',
+        eng_phev:       'Hybride rechargeable',
     },
 
     en: {
@@ -220,6 +238,24 @@ const TRANSLATIONS = {
         stat_by_type:   'By category',
         stat_by_energy: 'By engine type',
         stat_top_pow:   '🏆 Top power',
+
+        // Categories
+        cat_berline:    'Sedan',
+        cat_suv:        'SUV',
+        cat_coupe:      'Coupe',
+        cat_cabriolet:  'Convertible',
+        cat_supercar:   'Supercar',
+        cat_hypercar:   'Hypercar',
+        cat_citadine:   'City car',
+        cat_break:      'Estate',
+        cat_pickup:     'Pick-up',
+
+        // Engine types
+        eng_essence:    'Petrol',
+        eng_diesel:     'Diesel',
+        eng_elec:       'Electric',
+        eng_hybrid:     'Hybrid',
+        eng_phev:       'Plug-in hybrid',
     },
 };
 
@@ -243,12 +279,17 @@ function applyLang() {
         el.placeholder = t(key);
     });
 
+    document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+        const key = el.getAttribute('data-i18n-opt');
+        el.textContent = t(key);
+    });
+
     const langBtn = document.getElementById('lang-btn');
     if (langBtn) langBtn.textContent = t('lang_switch');
 
     document.title = currentLang === 'fr'
-        ? 'AutoBase — Base de Données Automobile'
-        : 'AutoBase — Automotive Database';
+        ? 'FullThrottle — Base de Données Automobile'
+        : 'FullThrottle — Automotive Database';
 
     if (typeof renderCards === 'function') renderCards();
 

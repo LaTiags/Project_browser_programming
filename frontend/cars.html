@@ -18,7 +18,7 @@
     <div class="logo">
         <div class="logo-icon">🏎️</div>
         <div>
-            <div class="logo-text">AutoBase</div>
+            <div class="logo-text">FullThrottle</div>
             <div class="logo-sub" data-i18n="subtitle"></div>
         </div>
     </div>
@@ -64,14 +64,23 @@
         </div>
         <select class="filter-select" id="filter-type" onchange="renderCards()">
             <option value="" data-i18n="all_categories"></option>
-            <option>Berline</option><option>SUV</option><option>Coupé</option>
-            <option>Cabriolet</option><option>Supercar</option><option>Citadine</option>
-            <option>Break</option><option>Pick-up</option>
+            <option value="Berline"   data-i18n-opt="cat_berline"></option>
+            <option value="SUV"       data-i18n-opt="cat_suv"></option>
+            <option value="Coupé"     data-i18n-opt="cat_coupe"></option>
+            <option value="Cabriolet" data-i18n-opt="cat_cabriolet"></option>
+            <option value="Supercar"  data-i18n-opt="cat_supercar"></option>
+            <option value="Hypercar"  data-i18n-opt="cat_hypercar"></option>
+            <option value="Citadine"  data-i18n-opt="cat_citadine"></option>
+            <option value="Break"     data-i18n-opt="cat_break"></option>
+            <option value="Pick-up"   data-i18n-opt="cat_pickup"></option>
         </select>
         <select class="filter-select" id="filter-energy" onchange="renderCards()">
             <option value="" data-i18n="all_engines"></option>
-            <option>Essence</option><option>Diesel</option><option>Électrique</option>
-            <option>Hybride</option><option>Hybride rechargeable</option>
+            <option value="Essence"              data-i18n-opt="eng_essence"></option>
+            <option value="Diesel"               data-i18n-opt="eng_diesel"></option>
+            <option value="Électrique"           data-i18n-opt="eng_elec"></option>
+            <option value="Hybride"              data-i18n-opt="eng_hybrid"></option>
+            <option value="Hybride rechargeable" data-i18n-opt="eng_phev"></option>
         </select>
     </div>
 
@@ -213,17 +222,26 @@
                 <label class="form-label" data-i18n="category"></label>
                 <select class="form-select" id="f-type">
                     <option value="" data-i18n="select"></option>
-                    <option>Berline</option><option>SUV</option><option>Coupé</option>
-                    <option>Cabriolet</option><option>Supercar</option><option>Citadine</option>
-                    <option>Break</option><option>Pick-up</option>
+                    <option value="Berline"   data-i18n-opt="cat_berline"></option>
+                    <option value="SUV"       data-i18n-opt="cat_suv"></option>
+                    <option value="Coupé"     data-i18n-opt="cat_coupe"></option>
+                    <option value="Cabriolet" data-i18n-opt="cat_cabriolet"></option>
+                    <option value="Supercar"  data-i18n-opt="cat_supercar"></option>
+                    <option value="Hypercar"  data-i18n-opt="cat_hypercar"></option>
+                    <option value="Citadine"  data-i18n-opt="cat_citadine"></option>
+                    <option value="Break"     data-i18n-opt="cat_break"></option>
+                    <option value="Pick-up"   data-i18n-opt="cat_pickup"></option>
                 </select>
             </div>
             <div class="form-group">
                 <label class="form-label" data-i18n="engine_type"></label>
                 <select class="form-select" id="f-energy">
                     <option value="" data-i18n="select"></option>
-                    <option>Essence</option><option>Diesel</option><option>Électrique</option>
-                    <option>Hybride</option><option>Hybride rechargeable</option>
+                    <option value="Essence"              data-i18n-opt="eng_essence"></option>
+                    <option value="Diesel"               data-i18n-opt="eng_diesel"></option>
+                    <option value="Électrique"           data-i18n-opt="eng_elec"></option>
+                    <option value="Hybride"              data-i18n-opt="eng_hybrid"></option>
+                    <option value="Hybride rechargeable" data-i18n-opt="eng_phev"></option>
                 </select>
             </div>
 
