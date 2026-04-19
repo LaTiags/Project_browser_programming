@@ -28,7 +28,7 @@ const AUTH_API               = `${AUTH_SUPABASE_URL}/auth/v1`;
 
 // Email de l'admin unique — seul cet email peut se connecter
 // Change cette valeur par ton vrai email
-const ADMIN_EMAIL = 'REMPLACE_PAR_TON_EMAIL_ADMIN';
+const ADMIN_EMAIL = 'cristianolecrack@gmail.com';
 
 
 // ============================================================
