@@ -98,6 +98,30 @@ const TRANSLATIONS = {
         import_api:     'Importer des modèles',
         lang_switch:    '🌐 EN',
 
+        // Login page
+        login_sub:      'Administration',
+        login_email:    'Email',
+        login_password: 'Mot de passe',
+        login_email_ph: 'ton@email.com',
+        login_pwd_ph:   '••••••••',
+        login_btn:      'Se connecter',
+        login_btn_loading: '⏳ Connexion…',
+        login_readonly: 'Continuer sans se connecter (lecture seule)',
+
+        // Set password page
+        setpwd_sub:     'Créer mon mot de passe',
+        setpwd_new:     'Nouveau mot de passe',
+        setpwd_new_ph:  'Minimum 6 caractères',
+        setpwd_confirm: 'Confirmer le mot de passe',
+        setpwd_confirm_ph: 'Répète ton mot de passe',
+        setpwd_btn:     'Créer mon mot de passe',
+        setpwd_btn_reset: 'Réinitialiser',
+        setpwd_btn_loading: '⏳ Enregistrement…',
+        setpwd_invalid: 'Lien invalide ou expiré. Demande un nouvel email d invitation.',
+        setpwd_short:   'Le mot de passe doit faire au moins 6 caractères.',
+        setpwd_mismatch:'Les deux mots de passe ne correspondent pas.',
+        setpwd_success: '✅ Mot de passe créé ! Redirection vers la connexion…',
+
         // Auth buttons
         btn_login:      '🔐 Connexion',
         btn_logout:     '🔓 Déconnexion',
@@ -270,6 +294,30 @@ const TRANSLATIONS = {
 
         import_api:     'Import models',
         lang_switch:    '🌐 FR',
+
+        // Login page
+        login_sub:      'Administration',
+        login_email:    'Email',
+        login_password: 'Password',
+        login_email_ph: 'your@email.com',
+        login_pwd_ph:   '••••••••',
+        login_btn:      'Sign in',
+        login_btn_loading: '⏳ Signing in…',
+        login_readonly: 'Continue without signing in (read only)',
+
+        // Set password page
+        setpwd_sub:     'Create my password',
+        setpwd_new:     'New password',
+        setpwd_new_ph:  'Minimum 6 characters',
+        setpwd_confirm: 'Confirm password',
+        setpwd_confirm_ph: 'Repeat your password',
+        setpwd_btn:     'Create my password',
+        setpwd_btn_reset: 'Reset password',
+        setpwd_btn_loading: '⏳ Saving…',
+        setpwd_invalid: 'Invalid or expired link. Request a new invitation email.',
+        setpwd_short:   'Password must be at least 6 characters.',
+        setpwd_mismatch:'Passwords do not match.',
+        setpwd_success: '✅ Password created! Redirecting to login…',
 
         // Auth buttons
         btn_login:      '🔐 Login',

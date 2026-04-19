@@ -6,6 +6,7 @@
     <title>FullThrottle — Connexion</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="login.css">
+    <script src="i18n.js"></script>
 </head>
 <body>
 
@@ -21,7 +22,7 @@
         <div class="login-logo">
             <div class="login-logo-icon">🏎️</div>
             <div class="login-logo-text">FullThrottle</div>
-            <div class="login-logo-sub">Administration</div>
+            <div class="login-logo-sub" data-i18n="login_sub"></div>
         </div>
 
         <!-- Message d'erreur (caché par défaut) -->
@@ -30,27 +31,25 @@
         <!-- Formulaire -->
         <div class="login-form">
             <div class="form-group">
-                <label class="form-label">Email</label>
+                <label class="form-label" data-i18n="login_email"></label>
                 <input class="form-input" id="email" type="email"
-                    placeholder="ton@email.com"
+                    data-i18n-placeholder="login_email_ph"
                     onkeydown="if(event.key==='Enter') login()">
             </div>
             <div class="form-group">
-                <label class="form-label">Mot de passe</label>
+                <label class="form-label" data-i18n="login_password"></label>
                 <input class="form-input" id="password" type="password"
-                    placeholder="••••••••"
+                    data-i18n-placeholder="login_pwd_ph"
                     onkeydown="if(event.key==='Enter') login()">
             </div>
 
             <button class="btn-login" id="btn-login" onclick="login()">
-                <span id="btn-login-text">Se connecter</span>
+                <span id="btn-login-text" data-i18n="login_btn"></span>
             </button>
         </div>
 
         <!-- Lien retour site -->
-        <a href="cars.html" class="login-back">
-            Continuer sans se connecter (lecture seule)
-        </a>
+        <a href="cars.html" class="login-back" data-i18n="login_readonly"></a>
 
     </div>
 </div>
@@ -70,8 +69,8 @@
 // ============================================================
 
 // ← Remplace par tes vraies valeurs (mêmes que api.js)
-const SUPABASE_URL      = 'https://gathpbjhirtksasfmicn.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_DCM5-BubeSaz0ipRero-7Q_9KXu2WU7';
+const SUPABASE_URL      = 'REMPLACE_PAR_TON_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'REMPLACE_PAR_TA_ANON_KEY';
 
 async function login() {
     const email    = document.getElementById('email').value.trim();
@@ -88,7 +87,7 @@ async function login() {
 
     // État chargement
     btn.disabled   = true;
-    btnText.textContent = '⏳ Connexion…';
+    btnText.textContent = typeof t === 'function' ? t('login_btn_loading') : '⏳ Connexion…';
     errorEl.style.display = 'none';
 
     try {
@@ -137,7 +136,7 @@ async function login() {
     } catch (error) {
         showError(error.message);
         btn.disabled    = false;
-        btnText.textContent = 'Se connecter';
+        btnText.textContent = typeof t === 'function' ? t('login_btn') : 'Se connecter';
     }
 }
 
