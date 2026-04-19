@@ -28,7 +28,7 @@ const AUTH_API               = `${AUTH_SUPABASE_URL}/auth/v1`;
 
 // Email de l'admin unique — seul cet email peut se connecter
 // Change cette valeur par ton vrai email
-const ADMIN_EMAIL = 'cristianolecrack@gmail.com';
+const ADMIN_EMAIL = 'REMPLACE_PAR_TON_EMAIL_ADMIN';
 
 
 // ============================================================
@@ -121,14 +121,14 @@ function applyAuthUI() {
     btn.className = 'btn-secondary';
 
     if (admin) {
-        // Admin connecté : affiche son email + bouton logout
-        btn.textContent = '🔓 Logout';
+        // Admin connecté — t() traduit selon la langue active
+        btn.textContent = typeof t === 'function' ? t('btn_logout') : '🔓 Logout';
         btn.onclick = logout;
         btn.style.borderColor = 'rgba(74, 222, 128, 0.4)';
         btn.style.color       = '#4ade80';
     } else {
-        // Non connecté : bouton login
-        btn.textContent = '🔐 Login';
+        // Non connecté
+        btn.textContent = typeof t === 'function' ? t('btn_login') : '🔐 Login';
         btn.onclick = () => window.location.href = 'login.html';
     }
 

@@ -11,10 +11,11 @@
 1. [Project Description](#project-description)
 2. [Features](#features)
 3. [Architecture Overview](#architecture-overview)
-4. [Technology Choices](#technology-choices)
-5. [Setup Instructions](#setup-instructions)
-6. [AI Usage Disclosure](#ai-usage-disclosure)
-7. [Reflection & Future Improvements](#reflection--future-improvements)
+4. [Backend](#backend)
+5. [Technology Choices](#technology-choices)
+6. [Setup Instructions](#setup-instructions)
+7. [AI Usage Disclosure](#ai-usage-disclosure)
+8. [Reflection & Future Improvements](#reflection--future-improvements)
 
 ---
 
@@ -117,6 +118,45 @@ User action → cars.js → api.js → Supabase REST API → PostgreSQL
                   ↓           + localStorage cache
              DOM updated
 ```
+
+---
+
+## Backend
+
+This project uses **Supabase** as a serverless backend (BaaS — Backend as a Service).
+
+Supabase provides:
+- A **PostgreSQL** database hosted in the cloud
+- An **auto-generated REST API** on every table (`/rest/v1/cars`)
+- **Row Level Security (RLS)** policies for access control
+- **JWT-based authentication** via Supabase Auth
+
+The frontend communicates directly with the Supabase REST API via `fetch()` calls in `api.js`.
+No local backend installation is required — the application is fully functional via the
+public Supabase API endpoint.
+
+### Why no Express server?
+
+> This approach satisfies the *"lightweight serverless backend"* requirement from the project
+> specification, and follows the documented exception:
+> *"If the backend is not publicly hosted, the frontend must still work using a public API"*
+> — which it does, via the Supabase REST API publicly hosted at
+> `https://gathpbjhirtksasfmicn.supabase.co`.
+
+### API Endpoints (Supabase REST)
+
+| Method | Endpoint | Action |
+|---|---|---|
+| `GET` | `/rest/v1/cars?select=*&order=id` | Fetch all vehicles |
+| `POST` | `/rest/v1/cars` | Create a new vehicle |
+| `PATCH` | `/rest/v1/cars?id=eq.:id` | Update a vehicle |
+| `DELETE` | `/rest/v1/cars?id=eq.:id` | Delete a vehicle |
+
+### Security (Row Level Security)
+
+Access is controlled by PostgreSQL RLS policies defined in `schema.sql`:
+- **Read** — public (anyone can view vehicles)
+- **Write / Update / Delete** — public at database level, but restricted at UI level via Supabase Auth (only the admin account sees write buttons)
 
 ---
 

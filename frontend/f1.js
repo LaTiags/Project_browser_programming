@@ -122,7 +122,7 @@ async function loadAll() {
         // Met à jour l'heure de dernière mise à jour
         const now = new Date();
         document.getElementById('last-update').textContent =
-            `Mis à jour ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+            `${t('f1_updated')} ${now.toLocaleTimeString(currentLang === 'en' ? 'en-GB' : 'fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
 
     } catch (error) {
         console.error('Erreur chargement F1 :', error);
@@ -147,7 +147,7 @@ async function loadDriverStandings() {
         const standings = data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || [];
 
         if (standings.length === 0) {
-            el.innerHTML = `<div class="error-state"><p>Aucune donnée disponible</p></div>`;
+            el.innerHTML = `<div class="error-state"><p>${t('f1_no_data')}</p></div>`;
             return;
         }
 
@@ -159,8 +159,8 @@ async function loadDriverStandings() {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Pilote</th>
-                        <th style="text-align:right">Pts</th>
+                        <th>${t('f1_driver_col')}</th>
+                        <th style="text-align:right">${t('f1_pts_col')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -185,7 +185,7 @@ async function loadDriverStandings() {
                                 </td>
                                 <td>
                                     <div class="points">${pts}</div>
-                                    <div class="points-label">pts</div>
+                                    <div class="points-label">${t('f1_pts')}</div>
                                 </td>
                             </tr>`;
                     }).join('')}
@@ -193,7 +193,7 @@ async function loadDriverStandings() {
             </table>`;
 
     } catch (error) {
-        el.innerHTML = `<div class="error-state"><div class="emoji">⚠️</div><p>Erreur : ${error.message}</p></div>`;
+        el.innerHTML = `<div class="error-state"><div class="emoji">⚠️</div><p>${t('f1_error')} : ${error.message}</p></div>`;
     }
 }
 
@@ -210,7 +210,7 @@ async function loadConstructorStandings() {
         const standings = data?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || [];
 
         if (standings.length === 0) {
-            el.innerHTML = `<div class="error-state"><p>Aucune donnée disponible</p></div>`;
+            el.innerHTML = `<div class="error-state"><p>${t('f1_no_data')}</p></div>`;
             return;
         }
 
@@ -221,8 +221,8 @@ async function loadConstructorStandings() {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Écurie</th>
-                        <th style="text-align:right">Pts</th>
+                        <th>${t('f1_team_col')}</th>
+                        <th style="text-align:right">${t('f1_pts_col')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -241,14 +241,14 @@ async function loadConstructorStandings() {
                                         <span class="team-color" style="background:${color}"></span>
                                         ${s.Constructor.name}
                                     </div>
-                                    <div class="driver-team">${s.wins} victoire${s.wins > 1 ? 's' : ''}</div>
+                                    <div class="driver-team">${s.wins} ${parseInt(s.wins) > 1 ? t('f1_wins') : t('f1_win')}</div>
                                     <div class="points-bar-wrap">
                                         <div class="points-bar" style="width:${pct}%;background:${color}"></div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="points">${pts}</div>
-                                    <div class="points-label">pts</div>
+                                    <div class="points-label">${t('f1_pts')}</div>
                                 </td>
                             </tr>`;
                     }).join('')}
@@ -256,7 +256,7 @@ async function loadConstructorStandings() {
             </table>`;
 
     } catch (error) {
-        el.innerHTML = `<div class="error-state"><div class="emoji">⚠️</div><p>Erreur : ${error.message}</p></div>`;
+        el.innerHTML = `<div class="error-state"><div class="emoji">⚠️</div><p>${t('f1_error')} : ${error.message}</p></div>`;
     }
 }
 
@@ -276,12 +276,12 @@ async function loadLastRace() {
         const results = race?.Results || [];
 
         if (!race || results.length === 0) {
-            el.innerHTML = `<div class="error-state"><div class="emoji">🏁</div><p>Aucune course disponible pour l'instant</p></div>`;
+            el.innerHTML = `<div class="error-state"><div class="emoji">🏁</div><p>${t('f1_no_race')}</p></div>`;
             return;
         }
 
         // Formate la date de la course
-        const raceDate = new Date(race.date).toLocaleDateString('fr-FR', {
+        const raceDate = new Date(race.date).toLocaleDateString(currentLang === 'en' ? 'en-GB' : 'fr-FR', {
             day: 'numeric', month: 'long', year: 'numeric'
         });
 
@@ -291,10 +291,10 @@ async function loadLastRace() {
                     <div>
                         <div class="race-name">🏁 ${race.raceName}</div>
                         <div class="race-meta">
-                            ${race.Circuit?.circuitName} · ${raceDate} · Round ${race.round}
+                            ${race.Circuit?.circuitName} · ${raceDate} · ${t('f1_round')} ${race.round}
                         </div>
                     </div>
-                    <div class="race-badge">Saison ${race.season}</div>
+                    <div class="race-badge">${t('f1_season')} ${race.season}</div>
                 </div>
                 <div class="race-results">
                     ${results.slice(0, 10).map(r => {
@@ -324,7 +324,7 @@ async function loadLastRace() {
             </div>`;
 
     } catch (error) {
-        el.innerHTML = `<div class="error-state"><div class="emoji">⚠️</div><p>Erreur : ${error.message}</p></div>`;
+        el.innerHTML = `<div class="error-state"><div class="emoji">⚠️</div><p>${t('f1_error')} : ${error.message}</p></div>`;
     }
 }
 
@@ -346,3 +346,15 @@ setInterval(() => {
     });
     loadAll();
 }, 5 * 60 * 1000);
+
+// ============================================================
+//   Hook langue — quand on change de langue sur la page F1,
+//   on re-rend les tableaux pour traduire les textes générés
+//   dynamiquement (colonnes, labels, badges)
+// ============================================================
+document.addEventListener('langChanged', () => {
+    // Vide le cache pour forcer le re-rendu avec les nouveaux labels
+    loadDriverStandings();
+    loadConstructorStandings();
+    loadLastRace();
+});

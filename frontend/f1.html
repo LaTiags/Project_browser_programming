@@ -18,13 +18,13 @@
         <div class="logo-icon">🏎️</div>
         <div>
             <div class="logo-text">FullThrottle F1</div>
-            <div class="logo-sub">Saison 2026 — Live Standings</div>
+            <div class="logo-sub" id="f1-logo-sub">Saison 2025 — Live Standings</div>
         </div>
     </div>
     <div class="header-right">
-        <span class="last-update" id="last-update">Chargement…</span>
+        <span class="last-update" id="last-update" data-i18n="f1_loading"></span>
         <button class="btn-refresh" id="btn-refresh" onclick="loadAll()" title="Actualiser">↻</button>
-        <a href="cars.html" class="btn-back">← FullThrottle</a>
+        <a href="cars.html" class="btn-back" data-i18n="f1_back"></a>
     </div>
 </header>
 
@@ -34,7 +34,7 @@
 <main>
 
     <!-- Dernière course — pleine largeur -->
-    <div class="section-title">🏁 Dernière course</div>
+    <div class="section-title" data-i18n="f1_last_race"></div>
     <div id="last-race-section" style="margin-bottom:36px">
         <!-- Skeleton loader -->
         <div class="skeleton skeleton-row" style="height:80px;margin-bottom:8px"></div>
@@ -48,7 +48,7 @@
 
         <!-- Classement pilotes -->
         <div>
-            <div class="section-title">👤 Pilotes</div>
+            <div class="section-title" data-i18n="f1_drivers"></div>
             <div class="card-container">
                 <div id="drivers-standings">
                     <div style="padding:20px">
@@ -64,7 +64,7 @@
 
         <!-- Classement constructeurs -->
         <div>
-            <div class="section-title">🏭 Constructeurs</div>
+            <div class="section-title" data-i18n="f1_constructors"></div>
             <div class="card-container">
                 <div id="constructors-standings">
                     <div style="padding:20px">
@@ -82,6 +82,7 @@
 
 </main>
 
+<script src="i18n.js"></script>
 <script src="auth.js"></script>
 <script src="f1.js"></script>
 

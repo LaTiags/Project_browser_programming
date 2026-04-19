@@ -63,7 +63,7 @@ function closeImportAPI() {
     if (resultsEl) resultsEl.innerHTML = `
         <div class="api-placeholder">
             <div style="font-size:40px;margin-bottom:12px">🔍</div>
-            <div>Recherche une marque pour voir les modèles disponibles</div>
+            <div>${t('cq_placeholder')}</div>
         </div>`;
     const searchEl = document.getElementById('api-search-input');
     if (searchEl) searchEl.value = '';
@@ -87,7 +87,7 @@ function populateYearFilter() {
     if (!select || select.options.length > 1) return; // Déjà rempli
 
     const currentYear = new Date().getFullYear();
-    select.innerHTML = '<option value="">Toutes les années</option>';
+    select.innerHTML = `<option value="">${t('cq_all_years')}</option>`;
 
     for (let year = currentYear; year >= 1950; year--) {
         const opt      = document.createElement('option');
@@ -115,14 +115,14 @@ async function searchCarQuery() {
     const results = document.getElementById('api-results');
 
     if (!input) {
-        results.innerHTML = `<div class="api-placeholder" style="color:#fbbf24">⚠ Entre une marque à rechercher</div>`;
+        results.innerHTML = `<div class="api-placeholder" style="color:#fbbf24">${t('cq_no_input')}</div>`;
         return;
     }
 
     // ---- État chargement ----
-    btn.textContent = '⏳';
+    btn.textContent = t('cq_searching');
     btn.disabled    = true;
-    results.innerHTML = `<div class="api-placeholder">⏳ Recherche en cours…</div>`;
+    results.innerHTML = `<div class="api-placeholder">${t('cq_loading')}</div>`;
     selectedCars.clear();
     updateImportButton();
 
@@ -159,10 +159,8 @@ async function searchCarQuery() {
         if (!data.Models || data.Models.length === 0) {
             results.innerHTML = `
                 <div class="api-placeholder">
-                    😕 Aucun modèle trouvé pour "<strong>${input}</strong>"<br>
-                    <small style="margin-top:8px;display:block">
-                        Essaie en anglais : "Mercedes-Benz", "Audi", "Toyota", "Porsche"…
-                    </small>
+                    😕 ${t('cq_not_found')} "<strong>${input}</strong>"<br>
+                    <small style="margin-top:8px;display:block">${t('cq_hint')}</small>
                 </div>`;
             return;
         }
@@ -174,11 +172,11 @@ async function searchCarQuery() {
         console.error('Erreur Car Query :', error);
         results.innerHTML = `
             <div class="api-placeholder" style="color:#ff6b6b">
-                ❌ Erreur de connexion à Car Query<br>
+                ${t('cq_error')}<br>
                 <small>${error.message}</small>
             </div>`;
     } finally {
-        btn.textContent = 'Rechercher';
+        btn.textContent = t('cq_search');
         btn.disabled    = false;
     }
 }
@@ -208,10 +206,10 @@ function renderAPIResults(models) {
     const resultsEl = document.getElementById('api-results');
     const countEl   = document.getElementById('api-results-count');
 
-    countEl.textContent = `${models.length} modèle${models.length > 1 ? 's' : ''} trouvé${models.length > 1 ? 's' : ''}`;
+    countEl.textContent = `${models.length} ${models.length > 1 ? t('cq_found_many') : t('cq_found_one')}`;
 
     if (models.length === 0) {
-        resultsEl.innerHTML = `<div class="api-placeholder">Aucun modèle pour cette année</div>`;
+        resultsEl.innerHTML = `<div class="api-placeholder">${t('cq_no_year')}</div>`;
         return;
     }
 
@@ -292,7 +290,7 @@ async function importSelected() {
     const btn = document.getElementById('api-import-btn');
     if (selectedCars.size === 0) return;
 
-    btn.textContent = '⏳ Import…';
+    btn.textContent = t('cq_importing');
     btn.disabled    = true;
 
     const checkboxes = document.querySelectorAll('.api-checkbox:checked');
@@ -345,8 +343,8 @@ async function importSelected() {
     if (typeof renderCards === 'function') renderCards();
 
     const msg = errors > 0
-        ? `✅ ${imported} importée(s), ❌ ${errors} erreur(s)`
-        : `✅ ${imported} voiture(s) importée(s) dans FullThrottle !`;
+        ? `✅ ${imported} ${t('cq_imported')}, ❌ ${errors} ${t('cq_import_err')}`
+        : `✅ ${imported} ${t('cq_imported')}`;
 
     if (typeof showStatus === 'function') showStatus(msg, imported > 0 ? 'success' : 'error');
 

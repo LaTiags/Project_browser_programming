@@ -98,6 +98,51 @@ const TRANSLATIONS = {
         import_api:     'Importer des modèles',
         lang_switch:    '🌐 EN',
 
+        // Auth buttons
+        btn_login:      '🔐 Connexion',
+        btn_logout:     '🔓 Déconnexion',
+
+        // Car Query modal
+        cq_title:       '🔍 Importer depuis Car Query',
+        cq_sub:         'Recherche des vrais modèles et importe-les dans ta base',
+        cq_placeholder: 'Ex: Ferrari, BMW, Toyota…',
+        cq_search:      'Rechercher',
+        cq_searching:   '⏳ Recherche…',
+        cq_all_years:   'Toutes les années',
+        cq_close:       'Fermer',
+        cq_import_btn:  'Importer la sélection',
+        cq_no_input:    '⚠ Entre une marque à rechercher',
+        cq_loading:     '⏳ Recherche en cours…',
+        cq_not_found:   'Aucun modèle trouvé pour',
+        cq_hint:        'Essaie en anglais : "Mercedes-Benz", "Audi", "Toyota", "Porsche"…',
+        cq_error:       '❌ Erreur de connexion',
+        cq_no_year:     'Aucun modèle pour cette année',
+        cq_found_one:   'modèle trouvé',
+        cq_found_many:  'modèles trouvés',
+        cq_importing:   '⏳ Import…',
+        cq_imported:    'voiture(s) importée(s) !',
+        cq_import_err:  'erreur(s)',
+
+        // F1 page
+        f1_loading:     'Chargement…',
+        f1_updated:     'Mis à jour',
+        f1_refresh:     '↻ Actualiser',
+        f1_back:        '← FullThrottle',
+        f1_last_race:   '🏁 Dernière course',
+        f1_drivers:     '👤 Pilotes',
+        f1_constructors:'🏭 Constructeurs',
+        f1_no_data:     'Aucune donnée disponible',
+        f1_no_race:     'Aucune course disponible pour l instant',
+        f1_error:       'Erreur',
+        f1_driver_col:  'Pilote',
+        f1_team_col:    'Écurie',
+        f1_pts_col:     'Pts',
+        f1_pts:         'pts',
+        f1_season:      'Saison',
+        f1_round:       'Round',
+        f1_win:         'victoire',
+        f1_wins:        'victoires',
+
         // Comparateur
         compare_label:  'Comparer',
         compare_go:     '⚡ Comparer',
@@ -226,6 +271,51 @@ const TRANSLATIONS = {
         import_api:     'Import models',
         lang_switch:    '🌐 FR',
 
+        // Auth buttons
+        btn_login:      '🔐 Login',
+        btn_logout:     '🔓 Logout',
+
+        // Car Query modal
+        cq_title:       '🔍 Import from Car Query',
+        cq_sub:         'Search real models and import them into your database',
+        cq_placeholder: 'e.g. Ferrari, BMW, Toyota…',
+        cq_search:      'Search',
+        cq_searching:   '⏳ Searching…',
+        cq_all_years:   'All years',
+        cq_close:       'Close',
+        cq_import_btn:  'Import selection',
+        cq_no_input:    '⚠ Enter a brand to search',
+        cq_loading:     '⏳ Searching…',
+        cq_not_found:   'No models found for',
+        cq_hint:        'Try: "Mercedes-Benz", "Audi", "Toyota", "Porsche"…',
+        cq_error:       '❌ Connection error',
+        cq_no_year:     'No models for this year',
+        cq_found_one:   'model found',
+        cq_found_many:  'models found',
+        cq_importing:   '⏳ Importing…',
+        cq_imported:    'vehicle(s) imported!',
+        cq_import_err:  'error(s)',
+
+        // F1 page
+        f1_loading:     'Loading…',
+        f1_updated:     'Updated',
+        f1_refresh:     '↻ Refresh',
+        f1_back:        '← FullThrottle',
+        f1_last_race:   '🏁 Last race',
+        f1_drivers:     '👤 Drivers',
+        f1_constructors:'🏭 Constructors',
+        f1_no_data:     'No data available',
+        f1_no_race:     'No race available yet',
+        f1_error:       'Error',
+        f1_driver_col:  'Driver',
+        f1_team_col:    'Team',
+        f1_pts_col:     'Pts',
+        f1_pts:         'pts',
+        f1_season:      'Season',
+        f1_round:       'Round',
+        f1_win:         'win',
+        f1_wins:        'wins',
+
         // Comparator
         compare_label:  'Compare',
         compare_go:     '⚡ Compare',
@@ -298,6 +388,10 @@ function applyLang() {
     if (typeof currentDetailId !== 'undefined' && currentDetailId !== null) {
         if (typeof openDetail === 'function') openDetail(currentDetailId);
     }
+
+    // Dispatch un événement custom pour que f1.js puisse
+    // re-rendre ses tableaux quand la langue change
+    document.dispatchEvent(new CustomEvent('langChanged'));
 }
 
 async function toggleLang() {
