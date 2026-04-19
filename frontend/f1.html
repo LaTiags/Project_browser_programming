@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FullThrottle — F1 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="f1.css">
+
+</head>
+<body>
+
+<!-- ==============================
+     HEADER
+============================== -->
+<header>
+    <div class="logo">
+        <div class="logo-icon">🏎️</div>
+        <div>
+            <div class="logo-text">FullThrottle F1</div>
+            <div class="logo-sub">Saison 2025 — Live Standings</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <span class="last-update" id="last-update">Chargement…</span>
+        <button class="btn-refresh" id="btn-refresh" onclick="loadAll()" title="Actualiser">↻</button>
+        <a href="cars.html" class="btn-back">← FullThrottle</a>
+    </div>
+</header>
+
+<!-- ==============================
+     MAIN
+============================== -->
+<main>
+
+    <!-- Dernière course — pleine largeur -->
+    <div class="section-title">🏁 Dernière course</div>
+    <div id="last-race-section" style="margin-bottom:36px">
+        <!-- Skeleton loader -->
+        <div class="skeleton skeleton-row" style="height:80px;margin-bottom:8px"></div>
+        <div class="skeleton skeleton-row"></div>
+        <div class="skeleton skeleton-row"></div>
+        <div class="skeleton skeleton-row"></div>
+    </div>
+
+    <!-- Classements côte à côte -->
+    <div class="f1-grid">
+
+        <!-- Classement pilotes -->
+        <div>
+            <div class="section-title">👤 Pilotes</div>
+            <div class="card-container">
+                <div id="drivers-standings">
+                    <div style="padding:20px">
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Classement constructeurs -->
+        <div>
+            <div class="section-title">🏭 Constructeurs</div>
+            <div class="card-container">
+                <div id="constructors-standings">
+                    <div style="padding:20px">
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                        <div class="skeleton skeleton-row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<script src="auth.js"></script>
+<script src="f1.js"></script>
+
+</body>
+</html>

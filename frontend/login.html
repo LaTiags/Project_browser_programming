@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FullThrottle — Connexion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+<div class="login-page">
+
+    <!-- Fond décoratif animé -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="login-card">
+
+        <!-- Logo -->
+        <div class="login-logo">
+            <div class="login-logo-icon">🏎️</div>
+            <div class="login-logo-text">FullThrottle</div>
+            <div class="login-logo-sub">Administration</div>
+        </div>
+
+        <!-- Message d'erreur (caché par défaut) -->
+        <div class="login-error" id="login-error" style="display:none"></div>
+
+        <!-- Formulaire -->
+        <div class="login-form">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" id="email" type="email"
+                    placeholder="ton@email.com"
+                    onkeydown="if(event.key==='Enter') login()">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                <input class="form-input" id="password" type="password"
+                    placeholder="••••••••"
+                    onkeydown="if(event.key==='Enter') login()">
+            </div>
+
+            <button class="btn-login" id="btn-login" onclick="login()">
+                <span id="btn-login-text">Se connecter</span>
+            </button>
+        </div>
+
+        <!-- Lien retour site -->
+        <a href="cars.html" class="login-back">
+            Continuer sans se connecter (lecture seule)
+        </a>
+
+    </div>
+</div>
+
+<script>
+// ============================================================
+//   login.js (inline) — Connexion via Supabase Auth
+//
+//   On appelle directement l'API REST Supabase Auth :
+//   POST /auth/v1/token?grant_type=password
+//   Corps : { email, password }
+//   Réponse : { access_token, refresh_token, user, expires_at }
+//
+//   Supabase stocke automatiquement la session dans localStorage
+//   si on utilise le SDK JS. Ici on le fait manuellement pour
+//   ne pas avoir à importer le SDK complet.
+// ============================================================
+
+// ← Remplace par tes vraies valeurs (mêmes que api.js)
+const SUPABASE_URL      = 'https://gathpbjhirtksasfmicn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_DCM5-BubeSaz0ipRero-7Q_9KXu2WU7';
+
+async function login() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('btn-login');
+    const btnText  = document.getElementById('btn-login-text');
+    const errorEl  = document.getElementById('login-error');
+
+    // Validation basique
+    if (!email || !password) {
+        showError('Remplis ton email et mot de passe.');
+        return;
+    }
+
+    // État chargement
+    btn.disabled   = true;
+    btnText.textContent = '⏳ Connexion…';
+    errorEl.style.display = 'none';
+
+    try {
+        // --------------------------------------------------------
+        //   Appel API Supabase Auth
+        //
+        //   grant_type=password = connexion avec email + mot de passe
+        //   Supabase retourne un JWT (access_token) valide 1 heure
+        //   et un refresh_token pour renouveler la session.
+        // --------------------------------------------------------
+        const response = await fetch(
+            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+            {
+                method: 'POST',
+                headers: {
+                    'apikey':       SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Supabase renvoie error_description en cas d'échec
+            throw new Error(data.error_description || data.msg || 'Identifiants incorrects');
+        }
+
+        // ---- Succès : sauvegarde la session manuellement ----
+        // On reproduit le format que le SDK Supabase JS utilise
+        // pour que auth.js puisse la lire avec getSession()
+        const projectRef = SUPABASE_URL.split('//')[1].split('.')[0];
+        const storageKey = `sb-${projectRef}-auth-token`;
+
+        localStorage.setItem(storageKey, JSON.stringify({
+            access_token:  data.access_token,
+            refresh_token: data.refresh_token,
+            expires_at:    data.expires_at || (Math.floor(Date.now() / 1000) + 3600),
+            user:          data.user,
+        }));
+
+        // Redirige vers le site principal
+        window.location.href = 'cars.html';
+
+    } catch (error) {
+        showError(error.message);
+        btn.disabled    = false;
+        btnText.textContent = 'Se connecter';
+    }
+}
+
+function showError(msg) {
+    const el = document.getElementById('login-error');
+    el.textContent     = '⚠ ' + msg;
+    el.style.display   = 'block';
+    // Shake animation
+    el.style.animation = 'none';
+    setTimeout(() => { el.style.animation = 'shake 0.4s ease'; }, 10);
+}
+</script>
+</body>
+</html>

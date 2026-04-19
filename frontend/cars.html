@@ -24,15 +24,16 @@
     </div>
 
     <div class="header-actions">
+        <a href="f1.html" class="btn-secondary" style="text-decoration:none">🏎️ F1 2025</a>
         <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
         <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
-        <button class="btn-secondary" onclick="document.getElementById('import-input').click()" data-i18n="import"></button>
-        <button class="btn-secondary" onclick="exportJSON()" data-i18n="export"></button>
+        <button class="btn-secondary" onclick="document.getElementById('import-input').click()" data-i18n="import" class="btn-secondary admin-only"></button>
+        <button class="btn-secondary admin-only" onclick="exportJSON()" data-i18n="export"></button>
         <!-- Bouton import Car Query API -->
-        <button class="btn-secondary btn-api" onclick="openImportAPI()">
+        <button class="btn-secondary btn-api admin-only" onclick="openImportAPI()">
             🔍 <span data-i18n="import_api"></span>
         </button>
-        <button class="btn-add" onclick="openModal('add')">
+        <button class="btn-add admin-only" onclick="openModal('add')">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M7 1v12M1 7h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
             </svg>
@@ -333,8 +334,8 @@
 
         <div class="detail-body">
             <div class="detail-actions">
-                <button class="btn-edit"   onclick="editCurrent()"   data-i18n="edit"></button>
-                <button class="btn-danger" onclick="deleteCurrent()" data-i18n="delete"></button>
+                <button class="btn-edit admin-only"   onclick="editCurrent()"   data-i18n="edit"></button>
+                <button class="btn-danger admin-only" onclick="deleteCurrent()" data-i18n="delete"></button>
                 <button class="btn-cancel" onclick="closeDetail()"   data-i18n="close"></button>
             </div>
 
@@ -396,6 +397,7 @@
     </div>
 </div>
 
+<script src="auth.js"></script>
 <script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="translate.js"></script>

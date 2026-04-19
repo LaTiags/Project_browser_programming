@@ -366,7 +366,7 @@ function renderCardHTML(car, i) {
                 <div class="card-tags">${tagType}${tagEnergy}${tagPays}</div>
                 <div class="card-footer">
                     <div class="card-power">${power}${year}${soundIcon}</div>
-                    <button class="card-delete" onclick="event.stopPropagation(); handleDelete(${car.id})" title="Supprimer">
+                    <button class="card-delete admin-only" onclick="event.stopPropagation(); handleDelete(${car.id})" title="Supprimer">
                         <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                             <path d="M3 3l9 9M12 3l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                         </svg>
@@ -407,7 +407,7 @@ function renderRowHTML(car, i) {
             </div>
             <div class="car-row-actions">
                 <button style="background:none;border:none;color:${isFav ? 'var(--yellow)' : 'var(--muted)'};font-size:16px;cursor:pointer;padding:4px" onclick="toggleFav(${car.id}, event)">${isFav ? '★' : '☆'}</button>
-                <button class="card-delete" onclick="event.stopPropagation(); handleDelete(${car.id})" title="Supprimer" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;display:flex;align-items:center">
+                <button class="card-delete admin-only" onclick="event.stopPropagation(); handleDelete(${car.id})" title="Supprimer" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;display:flex;align-items:center">
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                         <path d="M3 3l9 9M12 3l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
